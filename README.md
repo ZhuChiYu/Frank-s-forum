@@ -42,6 +42,7 @@ alter table user
 	add bio varchar(256) null;
 ```
 ```bash
+[数据库迁移脚本]
 mvn flyway:migrate
 
 [github push脚本]
