@@ -11,7 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.http.HttpResponse;
 import java.util.UUID;
 
 @Controller
@@ -33,7 +36,8 @@ public class AuthorizeController {
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
-                           HttpServletRequest request){
+                           HttpServletRequest request,
+                           HttpServletResponse response){
         AccessTokenDto accessTokenDto = new AccessTokenDto();
 //        accessTokenDto.setClient_id("Iv1.48f3a31b14c54577");
         accessTokenDto.setClient_id(clientId);
@@ -44,17 +48,21 @@ public class AuthorizeController {
 
         String accessToken = githubProvider.getAccessToken(accessTokenDto);
         GithubUser githubUser=githubProvider.getUser(accessToken);
-        if(githubUser!=null){
+        System.out.println(githubUser.getName());
+        if(githubUser!=null && githubUser.getId()!=null ){
             //登陆成功
             User user=new User();
-            user.setToken(UUID.randomUUID().toString());
+            String token=UUID.randomUUID().toString();
+            user.setToken(token);
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setName(githubUser.getName());
             user.setGmtCreat(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreat());
+            user.setAvatarUrl(githubUser.getAvatar_url());
             userMapper.insert(user);
-            request.getSession().setAttribute("user",githubUser);
-            //获取到user存入数据库
+            response.addCookie(new Cookie("token",token));
+//            request.getSession().setAttribute("user",githubUser);
+//            //获取到user存入数据库
             return  "redirect:/";
     }else{
         //登陆失败
