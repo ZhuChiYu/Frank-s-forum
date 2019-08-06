@@ -5,6 +5,7 @@ import com.example.springbootdemo.dto.GithubUser;
 import com.example.springbootdemo.mapper.UserMapper;
 import com.example.springbootdemo.model.User;
 import com.example.springbootdemo.provider.GithubProvider;
+import com.example.springbootdemo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -30,7 +31,7 @@ public class AuthorizeController {
     public String redirectUrl;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserService userService;
 
 
     @GetMapping("/callback")
@@ -48,18 +49,15 @@ public class AuthorizeController {
 
         String accessToken = githubProvider.getAccessToken(accessTokenDto);
         GithubUser githubUser=githubProvider.getUser(accessToken);
-        System.out.println(githubUser.getName());
         if(githubUser!=null && githubUser.getId()!=null ){
             //登陆成功
-            User user=new User();
+            User user=new User();//创建用户前要去数据库里检查一下有没有该用户，有则根据id拿到用户，没有再创建
             String token=UUID.randomUUID().toString();
             user.setToken(token);
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setName(githubUser.getName());
-            user.setGmtCreat(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreat());
             user.setAvatarUrl(githubUser.getAvatar_url());
-            userMapper.insert(user);
+            userService.createOrUpdate(user);
             response.addCookie(new Cookie("token",token));
 //            request.getSession().setAttribute("user",githubUser);
 //            //获取到user存入数据库
@@ -67,7 +65,15 @@ public class AuthorizeController {
     }else{
         //登陆失败
         return  "redirect:/";
+        }
     }
-
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        request.getSession().removeAttribute("user");
+        Cookie cookie=new Cookie("token",null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/";
     }
 }
