@@ -22,18 +22,18 @@ public class IndexController {
     private QuestionService questionService;
     @Autowired
     private UserMapper userMapper;
+
     @GetMapping("/")
     public String index(HttpServletRequest request, Model model,
-                        @RequestParam(name="page",defaultValue = "1")Integer page,
-                        @RequestParam(name="size",defaultValue = "5") Integer size
-                        ){
+                        @RequestParam(name = "page", defaultValue = "1") Integer page,
+                        @RequestParam(name = "size", defaultValue = "5") Integer size
+    ) {
 
         //返回既带有questionmapper信息，又带有user信息。
-        PaginationDTO pagination =questionService.list(page,size);
-        model.addAttribute("pagination",pagination);
+        PaginationDTO pagination = questionService.list(page, size);
+        model.addAttribute("pagination", pagination);
         return "index";
     }
-
 
 
 }
