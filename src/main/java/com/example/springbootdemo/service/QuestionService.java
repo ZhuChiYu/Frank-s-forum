@@ -2,6 +2,9 @@ package com.example.springbootdemo.service;
 
 import com.example.springbootdemo.dto.PaginationDTO;
 import com.example.springbootdemo.dto.QuestionDTO;
+import com.example.springbootdemo.exception.CustomizeErrorCode;
+import com.example.springbootdemo.exception.CustomizeException;
+import com.example.springbootdemo.mapper.QuestionExtMapper;
 import com.example.springbootdemo.mapper.QuestionMapper;
 import com.example.springbootdemo.mapper.UserMapper;
 import com.example.springbootdemo.model.Question;
@@ -23,6 +26,9 @@ public class QuestionService {
     private QuestionMapper questionMapper;
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private QuestionExtMapper questionExtMapper;
 
 
 
@@ -94,9 +100,12 @@ public class QuestionService {
         return paginationDTO;
     }
 
-
+    //获取question详情的接口
     public QuestionDTO getById(Integer id) {
         Question question =questionMapper.selectByPrimaryKey(id);
+        if(question==null){
+            throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+        }
         QuestionDTO questionDTO=new QuestionDTO();
         //1、将questionMapper放到questionDTO中
         BeanUtils.copyProperties(question,questionDTO);
@@ -104,7 +113,7 @@ public class QuestionService {
         questionDTO.setUser(user);
         return questionDTO;
     }
-
+//更新接口
     public void createOrUpdate(Question question) {
         if(question.getId()==null){
             //创建问题
@@ -121,7 +130,28 @@ public class QuestionService {
             updateQuestion.setTag(question.getTag());
             QuestionExample example=new QuestionExample();
             example.createCriteria().andIdEqualTo(question.getId());
-            questionMapper.updateByExampleSelective(updateQuestion,example);
+            int updated=questionMapper.updateByExampleSelective(updateQuestion,example);
+            if(updated!=1){
+                throw new CustomizeException(CustomizeErrorCode.QUESTION_NOT_FOUND);
+            }
         }
+    }
+
+    public void incView(Integer id) {
+//        Question question=questionMapper.selectByPrimaryKey(id);
+//
+//        Question updateQuestion = new Question();
+
+//        //并发量很大时，线程不安全
+//        updateQuestion.setViewCount(question.getViewCount()+1);
+//
+//        QuestionExample questionExample =new QuestionExample();
+//        questionExample.createCriteria().andIdEqualTo(id);
+        Question question = new Question();
+        question.setId(id);
+        question.setViewCount(1);
+        questionExtMapper.incView(question);
+//        questionMapper.updateByExampleSelective(updateQuestion,questionExample);
+
     }
 }

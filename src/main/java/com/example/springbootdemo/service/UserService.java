@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class UserService {
+public class  UserService {
     @Autowired
     private UserMapper userMapper;
     //查询数据库中accountId是否存在，有则更新token，没有则插入

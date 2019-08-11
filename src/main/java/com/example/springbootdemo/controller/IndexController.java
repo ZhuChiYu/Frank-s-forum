@@ -1,19 +1,15 @@
 package com.example.springbootdemo.controller;
 
 import com.example.springbootdemo.dto.PaginationDTO;
-import com.example.springbootdemo.dto.QuestionDTO;
 import com.example.springbootdemo.mapper.UserMapper;
-import com.example.springbootdemo.model.User;
+import com.example.springbootdemo.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import com.example.springbootdemo.service.QuestionService;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Controller
 public class IndexController {

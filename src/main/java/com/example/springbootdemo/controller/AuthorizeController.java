@@ -59,6 +59,7 @@ public class AuthorizeController {
             user.setAvatarUrl(githubUser.getAvatar_url());
             userService.createOrUpdate(user);
             response.addCookie(new Cookie("token", token));
+
 //            request.getSession().setAttribute("user",githubUser);
 //            //获取到user存入数据库
             return "redirect:/";
@@ -73,7 +74,7 @@ public class AuthorizeController {
                          HttpServletResponse response) {
         request.getSession().removeAttribute("user");
         Cookie cookie = new Cookie("token", null);
-        cookie.setMaxAge(0);
+//        cookie.setMaxAge(0);
         response.addCookie(cookie);
         return "redirect:/";
     }

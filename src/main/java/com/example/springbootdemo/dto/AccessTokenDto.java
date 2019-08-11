@@ -10,4 +10,5 @@ public class AccessTokenDto {
     private String code;
     private String redirect_url;
     private String state;
+
 }
