@@ -37,6 +37,36 @@ create table user
 
 alter table user
 	add bio varchar(256) null;
+
+create table question
+(
+	id int auto_increment primary key,
+	title varchar(50) null,
+	description text null,
+	gmt_create bigint null,
+	gmt_modified bigint null,
+	creator int null,
+	comment_count int default 0 null,
+	view_count int default 0 null,
+	like_count int default 0 null,
+	tag varchar(256) null
+);
+
+alter table user add avatar_url varchar(100) null;
+
+create table comment
+(
+    id bigint auto_increment primary key,
+    parent_id bigint not null,
+    type int not null,
+    commentator int not null,
+    gmt_create bigint not null,
+    gmt_modified bigint not null,
+    like_count bigint default 0
+);
+
+alter table COMMENT
+	add content varchar(1024);COMMENT
 ```
 ```bash
 [数据库迁移脚本]

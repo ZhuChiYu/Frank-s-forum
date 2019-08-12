@@ -15,7 +15,7 @@
         </jdbcConnection>
 
         <javaTypeResolver >
-            <property name="forceBigDecimals" value="false" />
+            <property name="forceBigDecimals" value="true" />
         </javaTypeResolver>
 
         <javaModelGenerator targetPackage="com.example.springbootdemo.model" targetProject="src/main/java">
