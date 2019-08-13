@@ -5,10 +5,7 @@ import com.example.springbootdemo.dto.CommentDTO;
 import com.example.springbootdemo.enums.CommentTypeEnum;
 import com.example.springbootdemo.exception.CustomizeErrorCode;
 import com.example.springbootdemo.exception.CustomizeException;
-import com.example.springbootdemo.mapper.CommentMapper;
-import com.example.springbootdemo.mapper.QuestionExtMapper;
-import com.example.springbootdemo.mapper.QuestionMapper;
-import com.example.springbootdemo.mapper.UserMapper;
+import com.example.springbootdemo.mapper.*;
 import com.example.springbootdemo.model.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,9 @@ public class CommentService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private CommentExtMapper commentExtMapper;
+
     @Transactional
     public void insert(Comment comment) {
         if(comment.getParentId()==null || comment.getParentId()==0){
@@ -52,6 +52,11 @@ public class CommentService {
                 throw new CustomizeException(CustomizeErrorCode.COMMENT_NOT_ERROR);
             }
             commentMapper.insert(comment);
+            //增加评论数
+            Comment parentComment =new Comment();
+            parentComment.setId(comment.getParentId());
+            comment.setCommentCount(1L);
+            commentExtMapper.incCommentCount(parentComment);
         }else {
             //回复问题
             Question question = questionMapper.selectByPrimaryKey(comment.getParentId());
@@ -65,11 +70,14 @@ public class CommentService {
         }
     }
 
-    public List<CommentDTO> listByQuestionId(Long id) {
+    public List<CommentDTO> listbyTargetId(Long id, CommentTypeEnum type) {
         CommentExample commentExample=new CommentExample();
         commentExample.createCriteria().andParentIdEqualTo(id)
-                .andTypeEqualTo(CommentTypeEnum.QUESTION.getType());
+                .andTypeEqualTo(type.getType());
+        //按创建时间倒序
+        commentExample.setOrderByClause("gmt_create desc");
         List<Comment>comments=commentMapper.selectByExample(commentExample);
+
 
         if(comments.size()==0){
             return new ArrayList<>();

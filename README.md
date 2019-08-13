@@ -24,49 +24,48 @@ https://elasticsearch.cn/
 
 ## 脚本
 ```sql
+创建user表
 create table user
 (
-    id           int auto_increment
+    id           bigint auto_increment
         primary key,
     name         varchar(50)  null,
     account_id   varchar(100) null,
     token        char(36)     null,
     gmt_creat    bigint       null,
-    gmt_modified bigint       null
+    gmt_modified bigint       null,
+    bio varchar (256) null,
+    avatar_url varchar(100) null
 );
 
-alter table user
-	add bio varchar(256) null;
-
+创建question表
 create table question
 (
-	id int auto_increment primary key,
+	id bigint auto_increment primary key,
 	title varchar(50) null,
 	description text null,
 	gmt_create bigint null,
 	gmt_modified bigint null,
-	creator int null,
+	creator bigint null,
 	comment_count int default 0 null,
 	view_count int default 0 null,
 	like_count int default 0 null,
 	tag varchar(256) null
 );
 
-alter table user add avatar_url varchar(100) null;
-
+创建回复表
 create table comment
 (
     id bigint auto_increment primary key,
     parent_id bigint not null,
     type int not null,
-    commentator int not null,
+    commentator bigint not null,
     gmt_create bigint not null,
     gmt_modified bigint not null,
-    like_count bigint default 0
+    like_count bigint default 0,
+    comment_count bigint default 0,
+    content varchar(1024) not null
 );
-
-alter table COMMENT
-	add content varchar(1024);COMMENT
 ```
 ```bash
 [数据库迁移脚本]
