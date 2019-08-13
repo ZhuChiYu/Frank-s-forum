@@ -1,6 +1,6 @@
 package com.example.springbootdemo.controller;
 
-import com.example.springbootdemo.dto.CommentDTO;
+import com.example.springbootdemo.dto.CommentCreateDTO;
 import com.example.springbootdemo.dto.ResultDTO;
 import com.example.springbootdemo.exception.CustomizeErrorCode;
 import com.example.springbootdemo.mapper.CommentMapper;
@@ -25,7 +25,7 @@ public class CommentController {
     private CommentService commentService;
     @ResponseBody
     @RequestMapping(value = "/comment",method = RequestMethod.POST)
-    public Object post(@RequestBody CommentDTO commentDTO,
+    public Object post(@RequestBody CommentCreateDTO commentCreateDTO,
                        HttpServletRequest request){
         User user=(User) request.getSession().getAttribute("user");
         if(user==null){
@@ -33,9 +33,9 @@ public class CommentController {
         }
 
         Comment comment=new Comment();
-        comment.setParentId(commentDTO.getParentId());
-        comment.setContent(commentDTO.getContent());
-        comment.setType(commentDTO.getType());
+        comment.setParentId(commentCreateDTO.getParentId());
+        comment.setContent(commentCreateDTO.getContent());
+        comment.setType(commentCreateDTO.getType());
         comment.setGmtCreate(System.currentTimeMillis());
         comment.setGmtModified(System.currentTimeMillis());
         comment.setCommentator(1L);
