@@ -10,13 +10,16 @@ import com.example.springbootdemo.mapper.UserMapper;
 import com.example.springbootdemo.model.Question;
 import com.example.springbootdemo.model.QuestionExample;
 import com.example.springbootdemo.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 //service层用来组装两个mapper
 @Service
@@ -158,5 +161,25 @@ public class QuestionService {
         questionExtMapper.incView(question);
 //        questionMapper.updateByExampleSelective(updateQuestion,questionExample);
 
+    }
+
+    public List<QuestionDTO> selectRelated(QuestionDTO queryDTo) {
+        if(StringUtils.isBlank(queryDTo.getTag())){
+            return new ArrayList<>();
+        }
+        String[] tags = StringUtils.split(queryDTo.getTag(), ",");
+        String regexpTag= Arrays.stream(tags).collect(Collectors.joining("|"));
+        Question question=new Question();
+        question.setId(queryDTo.getId());
+        question.setTag(regexpTag);
+
+        List<Question> questions=questionExtMapper.selectRelated(question);
+        List<QuestionDTO> questionDTOS=questions.stream().map(q->{
+            QuestionDTO questionDTO=new QuestionDTO();
+            BeanUtils.copyProperties(q,questionDTO);
+            return questionDTO;
+        }).collect(Collectors.toList());
+
+        return questionDTOS;
     }
 }
